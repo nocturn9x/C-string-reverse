@@ -10,6 +10,7 @@ the standard input file and print it reversed on the standard output file. */
 #define INIT_SIZE 8
 #define NEW(kind, size) (kind*)reallocate(0, sizeof(kind) * size, NULL)
 #define RESIZE(kind, ptr, o, n) (kind*)reallocate(sizeof(kind) * o, sizeof(kind) * n, ptr)
+#define FREE(kind, size, ptr) reallocate(sizeof(kind) * size, 0, ptr)
 
 // Since uint_t does not work on Windows, we have to hack support for it somehow
 #if defined(_WIN16) || defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || defined(__WINDOWS__) || defined(__TOS_WIN__)
@@ -26,7 +27,7 @@ void* reallocate(uint_t oldsize, uint_t newsize, void* ptr) {
     if (oldsize == 0 && ptr == NULL) { // Allocate from 0 to newsize
         return malloc(newsize);
     }
-    else if (oldsize > 0 && ptr != NULL) {  // Free object (shrink to 0)
+    else if (newsize == 0 && ptr != NULL) {  // Free object (shrink to 0)
         free(ptr);
         return NULL;
     }
@@ -107,6 +108,6 @@ int main(int argc, char* argv[]) {
     }
     printf("The reverse of '%s' is '%s'\n", buffer, reversed);
     printf("Length of strings is %lu bytes\n", strlen(buffer));
-    free(buffer);
-    free(reversed);
+    FREE(char, strlen(buffer), buffer);
+    FREE(char, strlen(reversed), reversed);
 }
