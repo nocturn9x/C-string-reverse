@@ -22,10 +22,11 @@ void* reallocate(uint_t oldsize, uint_t newsize, void* ptr) {
     /* Allocates/reallocates/deallocates a block
     of memory using malloc, realloc and free */
 
+    if (oldsize < 0 || newsize < 0) return NULL;
     if (oldsize == 0 && ptr == NULL) { // Allocate from 0 to newsize
         return malloc(newsize);
     }
-    else if (oldsize == 0 && ptr != NULL) {  // Free object (shrink to 0)
+    else if (oldsize > 0 && ptr != NULL) {  // Free object (shrink to 0)
         free(ptr);
         return NULL;
     }
